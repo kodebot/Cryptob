@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cryptob", "src\Cryptob\Cryptob.csproj", "{2F402683-F4E5-44A8-8BEA-A99BA52A9981}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cryptob.Core", "src\Cryptob.Core\Cryptob.Core.csproj", "{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECFD4519-3898-4219-A468-DA3C18AB57DE}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ACA507C4-F807-4633-BE37-6BDDB46FABBA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{81465D6D-E5DC-423C-B32F-B576F3E305A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptob.Application", "src\Cryptob.Application\Cryptob.Application.csproj", "{FD1FCE08-E7D0-41DE-AB86-97B636C936B2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F402683-F4E5-44A8-8BEA-A99BA52A9981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F402683-F4E5-44A8-8BEA-A99BA52A9981}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F402683-F4E5-44A8-8BEA-A99BA52A9981}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F402683-F4E5-44A8-8BEA-A99BA52A9981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD1FCE08-E7D0-41DE-AB86-97B636C936B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD1FCE08-E7D0-41DE-AB86-97B636C936B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD1FCE08-E7D0-41DE-AB86-97B636C936B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD1FCE08-E7D0-41DE-AB86-97B636C936B2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2F402683-F4E5-44A8-8BEA-A99BA52A9981} = {ACA507C4-F807-4633-BE37-6BDDB46FABBA}
+		{816FCF6B-7DF1-4C71-88AF-F6ED35DC2C3B} = {ACA507C4-F807-4633-BE37-6BDDB46FABBA}
+		{FD1FCE08-E7D0-41DE-AB86-97B636C936B2} = {ACA507C4-F807-4633-BE37-6BDDB46FABBA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5DF852B1-7DFE-4A13-BD90-6F293CE748A7}
+	EndGlobalSection
+EndGlobal
