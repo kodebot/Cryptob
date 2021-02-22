@@ -244,7 +244,7 @@ namespace Cryptob.Core.Exchange
         public async Task<IEnumerable<BinanceOrder>> GetAllOrdersAsync(string symbol, int? limit = null)
         {
             _logger.LogDebug("Retrieving all Spot Orders for {@symbol}, limited to {@limit} records", symbol, limit);
-            var result = await _client.Spot.Order.GetAllOrdersAsync(symbol, limit = limit);
+            var result = await _client.Spot.Order.GetAllOrdersAsync(symbol, limit: limit);
 
             if (!result.Success)
             {

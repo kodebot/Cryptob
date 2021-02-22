@@ -99,6 +99,8 @@ namespace Cryptob
             serviceCollection.Configure<BinanceUserConfig>(Configuration.GetSection("binanceUserConfig"));
             serviceCollection.Configure<SlowFollowerConfig>(Configuration.GetSection("strategies:slowfollower"));
             serviceCollection.Configure<PriceBurstConfig>(Configuration.GetSection("strategies:priceBurst"));
+            serviceCollection.Configure<MarketMakerConfig>(Configuration.GetSection("strategies:marketMaker"));
+
             serviceCollection.AddTransient<PriceBurstStrategyBot>();
             serviceCollection.AddTransient<BuyDipStrategyBot>();
             serviceCollection.AddTransient<MarketMakerStrategyBot>();
