@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Binance.Net;
 using Binance.Net.Enums;
+using Binance.Net.Interfaces;
 using Binance.Net.Objects.Spot.SpotData;
 using CryptoExchange.Net.Objects;
 
@@ -11,7 +11,7 @@ namespace Cryptob.Core.Exchange
     public static class BinanceSpotExchangeExtensions
     {
         public static Task<WebCallResult<BinancePlacedOrder>> PlaceTestOrLiveOrderAsync(
-            this BinanceClient client,
+            this IBinanceClient client,
             bool test,
             string symbol,
             OrderSide side,
