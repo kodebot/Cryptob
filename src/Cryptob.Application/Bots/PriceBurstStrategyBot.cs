@@ -32,7 +32,7 @@ namespace Cryptob.Application.Bots
             {
                 var symbol = _binanceSpotExchange.GetSymbol(_priceBurstConfig.Base, _priceBurstConfig.Quote);
                 _logger.LogInformation("Trading pair {@symbol}", symbol);
-                _logger.LogInformation("Trading settings: TradeDifference={@TradeDifference}, TradeProfit={@TradeProfitPercentage}%, TradeQuantity={@TradeQuantity}",
+                _logger.LogInformation("Trading settings: SpreadInQuoteCoin={@SpreadInQuoteCoin}, TradeProfit={@TradeProfitPercentage}%, TradeQuantity={@TradeQuantity}",
                     _priceBurstConfig.TradeDifference, _priceBurstConfig.TradeProfitPercentage, _priceBurstConfig.TradeQuantity);
 
                 var orderId = default(long?);

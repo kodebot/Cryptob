@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Binance.Net;
 using Binance.Net.Enums;
@@ -27,9 +28,11 @@ namespace Cryptob.Core.Exchange
         Task<IEnumerable<BinanceOrder>> GetAllOrdersAsync(string symbol, int? limit = null);
         Task<IEnumerable<BinanceOrder>> GetOpenOrdersAsync(string symbol);
         Task<bool> CancelOrderAsync(string symbol, long orderId);
-        Task<IEnumerable<string>> CancelAllOpenOrdersAsync(string symbol);
+        Task<IEnumerable<long>> CancelAllOpenOrdersAsync(string symbol);
         string GetSymbol(string baseCurrency, string quoteCurrency);
         Task<IBinanceTick> Get24HourPriceAsync(string symbol);
+        Task<BinanceSymbol> GetSymbolInfoAsync(string symbol);
+        Task<bool> ConvertLimitToMarketOrder(string symbol, long orderId, bool test = false);
     }
 
     public class BinanceSpotExchange : IBinanceSpotExchange, IDisposable
@@ -211,19 +214,88 @@ namespace Cryptob.Core.Exchange
                 return false;
             }
         }
-        public async Task<IEnumerable<string>> CancelAllOpenOrdersAsync(string symbol)
+        public async Task<IEnumerable<long>> CancelAllOpenOrdersAsync(string symbol)
         {
             _logger.LogDebug("Cancelling all open Spot orders for {@symbol}", symbol);
-            var result = await _client.Spot.Order.CancelAllOpenOrdersAsync(symbol);
+            var openOrders = (await GetOpenOrdersAsync(symbol)).Select(o => o.OrderId).ToList();
+            var cancelOrderTasks = openOrders.Select(order => CancelOrderAsync(symbol, order));
+            var result = await Task.WhenAll(cancelOrderTasks);
 
-            if (!result.Success)
+            if (!result.All(x => x))
             {
-                _logger.LogError("Error while while cancelling all open Spot Orders {@symbol}, error={@Error}", symbol, result.Error);
-                throw new Exception($"Unable to Cancel all open Spot Orders for {symbol} error={result.Error?.Message}");
+                _logger.LogError("Error while while cancelling all open Spot Orders {@symbol}", symbol);
+                throw new Exception($"Unable to Cancel all open Spot Orders for {symbol}");
             }
 
-            _logger.LogInformation("Spot Orders {@orderIds} for {@symbol} cancelled successfully", result.Data, symbol);
-            return result.Data.Select(x => x.Id);
+            if (openOrders.Any())
+            {
+                _logger.LogInformation("Spot Orders {@openOrders} for {@symbol} cancelled successfully", openOrders, symbol);
+            }
+            else
+            {
+                _logger.LogInformation("No Spot Orders for {@symbol} to cancel", symbol);
+            }
+
+            return openOrders;
+        }
+        public async Task<bool> ConvertLimitToMarketOrder(string symbol, long orderId, bool test = false)
+        {
+            _logger.LogDebug("Converting Limit order {@orderId} to Market order for {@symbol} ", orderId, symbol);
+            var cancellationResult = await CancelOrderAsync(symbol, orderId);
+            if (!cancellationResult)
+            {
+                _logger.LogWarning("Unable to cancel order {@orderId}. Probably it has been filled", orderId);
+                return false;
+            }
+
+            var orderLimit = 10;
+            var orders = await GetAllOrdersAsync(symbol, orderLimit);
+            var order = orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+            {
+                _logger.LogWarning("Unable to find order {@orderId}. Probably not included in the limit {@orderLimit}", orderId, orderLimit);
+                return false;
+            }
+
+            var remainingQuantity = order.Quantity - order.QuantityFilled;
+            if (remainingQuantity <= 0)
+            {
+                _logger.LogWarning("Remaining quantity is {@remainingQuantity} for {@orderId}. Probably order is fulfilled successfully ", remainingQuantity, orderId);
+                return false;
+            }
+
+            var side = order.Side;
+            if (side == OrderSide.Buy)
+            {
+
+                _logger.LogInformation("Converting Limit {@side} order {@orderId} to Market order.", side, orderId);
+                var buyOrderResult = await PlaceMarketBuyOrderAsync(symbol, remainingQuantity, test);
+                if (buyOrderResult)
+                {
+                    _logger.LogInformation("Converted Limit {@side} order {@orderId} to Market order.", side, orderId);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogWarning("Unable to convert Limit {@side} order {@orderId} to Market order.", side, orderId);
+                    return false;
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Converting Limit {@side} order {@orderId} to Market order.", side, orderId);
+                var buyOrderResult = await PlaceMarketSellOrderAsync(symbol, remainingQuantity, test);
+                if (buyOrderResult)
+                {
+                    _logger.LogInformation("Converted Limit {@side} order {@orderId} to Market order.", side, orderId);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogWarning("Unable to convert Limit {@side} order {@orderId} to Market order.", side, orderId);
+                    return false;
+                }
+            }
         }
 
         public async Task<BinanceOrderBook> GetOrderBookAsync(string symbol, int limit)
@@ -277,6 +349,19 @@ namespace Cryptob.Core.Exchange
             }
 
             return $"{baseCurrency.ToUpperInvariant()}{quoteCurrency.ToUpperInvariant()}";
+        }
+        public async Task<BinanceSymbol> GetSymbolInfoAsync(string symbol)
+        {
+            _logger.LogDebug("Retrieving SymbolInfo for {@symbol}", symbol);
+            var result = await _client.Spot.System.GetExchangeInfoAsync();
+
+            if (!result.Success)
+            {
+                _logger.LogError("Error while getting SymbolInfo for {@symbol}, error={@Error}", symbol, result.Error);
+                throw new Exception($"Unable to get SymbolInfo for {symbol}, error={result.Error?.Message}");
+            }
+
+            return result.Data.Symbols.Single(s => s.Name.Equals(symbol, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task<IBinanceTick> Get24HourPriceAsync(string symbol)
